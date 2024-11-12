@@ -88,6 +88,13 @@
       padding: 20px;
     }
 
+    .ending {
+      color: #FF66B2;
+      font-size: 2em;
+      text-align: center;
+      font-weight: bold;
+    }
+
     @media screen and (max-width: 768px) {
       .container {
         grid-template-columns: repeat(5, 1fr);
@@ -123,7 +130,7 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="container" id="container">
     <div class="box" onclick="showMessage(1)">1</div>
     <div class="box" onclick="showMessage(2)">2</div>
     <div class="box" onclick="showMessage(3)">3</div>
@@ -140,12 +147,19 @@
     <span id="close" class="close" onclick="closePopup()">&times;</span>
     <p id="message"></p>
   </div>
+
+  <div id="messageDisplay" class="ending"></div>
 </body>
 
 <script>
   const popup = document.getElementById('popup');
-  const overlay = document.getElementById('overlay')
+  const overlay = document.getElementById('overlay');
+  const clickedButtons = new Set();
+  const container = document.getElementById('container')
+  let lastPopupClosed = false;
   function showMessage(num) {
+    clickedButtons.add(num)
+    console.log(clickedButtons.size)
     const messages = {
       1: 'Miss you boss!! *crying',
       2: 'Asa akoa kiss? :((',
@@ -163,13 +177,38 @@
     message.textContent = messages[num] || 'Wala pa boss';
     popup.style.display = 'block';
     overlay.style.display = 'block';
+
+    if (clickedButtons.size === 10) {
+      lastPopupClosed = false;
+    }
   }
 
   function closePopup() {
     popup.style.display = 'none';
     overlay.style.display = 'none';
+    if (clickedButtons.size === 10 && !lastPopupClosed) {
+      lastPopupClosed = true;
+      container.style.display = 'none';
+      const lastMessage = `GWAPAHA NIMO BABEEE OY MURA MAN UG KISS AHAHHAA LABLAAAAB!! PROUD OF YOUUU MWAAAAAA!!!`
+      displayTypewriterEffect(lastMessage);
+    }
   }
 
+  function displayTypewriterEffect(text) {
+    const messageDisplay = document.getElementById('messageDisplay');
+    let i = 0;
+    messageDisplay.innerHTML = ''; // Clear any previous text
+
+    function typeWriter() {
+      if (i < text.length) {
+        messageDisplay.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 100); // Adjust the speed here (100ms)
+      }
+    }
+
+    typeWriter();
+  }
   window.addEventListener('click', function (event) {
     if (event.target === overlay) {
       closePopup();
